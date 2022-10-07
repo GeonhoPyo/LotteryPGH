@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         new LotteryDataController().readExcel(getBaseContext());
+        new LotteryDataController().makeNumber();
     }
 
     @Override

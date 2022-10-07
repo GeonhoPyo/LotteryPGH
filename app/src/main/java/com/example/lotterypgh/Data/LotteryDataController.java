@@ -158,4 +158,28 @@ public class LotteryDataController {
         }
         return 0;
     }
+
+
+
+    //랜덤 숫자 제작
+    //숫자 한 줄씩(6자리)를 만들어내는데, 조건에 부합하지 않는다면 다시 만듬.
+    public void makeNumber(){
+        ArrayList<Integer> resultNumberArray = new ArrayList<>();
+        for(int i = 0 ; i < 6 ; i ++){
+            int randomNum = (int) (Math.random()*44)+1;
+            resultNumberArray.add(randomNum);
+        }
+
+        Collections.sort(resultNumberArray);
+
+        LotteryData lotteryData = new LotteryData(resultNumberArray.get(0),resultNumberArray.get(1),resultNumberArray.get(2),
+                resultNumberArray.get(3),resultNumberArray.get(4),resultNumberArray.get(5));
+        Dlog.e("lotteryData : " + lotteryData);
+
+        //랜덤 변수 생성 완료
+
+        //조건 확인 로직 추가
+
+
+    }
 }
