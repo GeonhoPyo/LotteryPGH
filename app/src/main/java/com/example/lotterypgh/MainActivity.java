@@ -2,6 +2,8 @@ package com.example.lotterypgh;
 
 import android.os.Bundle;
 
+import com.example.lotterypgh.Data.LotteryDataController;
+import com.example.lotterypgh.Tool.Dlog;
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -43,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+        new LotteryDataController().readExcel(getBaseContext());
     }
 
     @Override

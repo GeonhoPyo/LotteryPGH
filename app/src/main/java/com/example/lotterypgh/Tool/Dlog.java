@@ -12,14 +12,12 @@ public class Dlog {
     static final int MAX_LENGTH = 4000;
     /** Log Level Error **/
     public static final <T> void e(T message) {
-        if (BaseApplication.DEBUG){
-            String msg = String.valueOf(message);
-            if (msg.length() > MAX_LENGTH){
-                Log.e(TAG, buildLogMsg(msg.substring(0, MAX_LENGTH)));
-                Log.e(TAG, msg.substring(MAX_LENGTH));
-            }else{
-                Log.e(TAG, buildLogMsg(msg));
-            }
+        String msg = String.valueOf(message);
+        if (msg.length() > MAX_LENGTH){
+            Log.e(TAG, buildLogMsg(msg.substring(0, MAX_LENGTH)));
+            Log.e(TAG, msg.substring(MAX_LENGTH));
+        }else{
+            Log.e(TAG, buildLogMsg(msg));
         }
     }
     /** Log Level Warning **/
