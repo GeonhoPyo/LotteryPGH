@@ -1,5 +1,7 @@
 package com.example.lotterypgh.Data;
 
+import java.util.Objects;
+
 public class LotteryData {
     public int number_1 ;
     public int number_2 ;
@@ -16,6 +18,20 @@ public class LotteryData {
         this.number_5 =number_5;
         this.number_6 =number_6;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LotteryData that = (LotteryData) o;
+        return number_1 == that.number_1 && number_2 == that.number_2 && number_3 == that.number_3 && number_4 == that.number_4 && number_5 == that.number_5 && number_6 == that.number_6;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(number_1, number_2, number_3, number_4, number_5, number_6);
+    }
+
 
     @Override
     public String toString() {

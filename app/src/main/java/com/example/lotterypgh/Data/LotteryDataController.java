@@ -163,23 +163,237 @@ public class LotteryDataController {
 
     //랜덤 숫자 제작
     //숫자 한 줄씩(6자리)를 만들어내는데, 조건에 부합하지 않는다면 다시 만듬.
-    public void makeNumber(){
+    public void numberController(Context context){
+
+        //int numberOfNum = 0;
+
+
+        LotteryData lotteryData = makeNumber();
+        if(!equalsHistory(context,lotteryData)){
+
+        }else{// 예전에 동일 번호 없다면 true
+            //패턴 확인
+            int plus = lotteryData.number_1 + lotteryData.number_2+ lotteryData.number_3+ lotteryData.number_4+ lotteryData.number_5+ lotteryData.number_6;
+            if(plus >= 138){ //상위 패턴
+                Dlog.e("plus : "+plus+", 상위");
+            }else { // 하위 패턴
+                Dlog.e("plus : "+plus+", 하위");
+            }
+            if(plus > 238){
+                Dlog.e("MAX");
+            }else if(plus < 48){
+                Dlog.e("MIN");
+            }else {
+                Dlog.e("MIN < plus < MAX");
+            }
+
+        }
+
+
+
+
+        //avgPlusResult();
+        //testPattern();
+
+    }
+
+    private LotteryData makeNumber(){
+
         ArrayList<Integer> resultNumberArray = new ArrayList<>();
-        for(int i = 0 ; i < 6 ; i ++){
+        for(int i = 0 ; resultNumberArray.size() < 6 ; i ++){
             int randomNum = (int) (Math.random()*44)+1;
-            resultNumberArray.add(randomNum);
+            if(resultNumberArray.isEmpty()){
+                resultNumberArray.add(randomNum);
+            }else{
+                if(!resultNumberArray.contains(randomNum)){
+                    resultNumberArray.add(randomNum);
+                }
+            }
+
         }
 
         Collections.sort(resultNumberArray);
 
-        LotteryData lotteryData = new LotteryData(resultNumberArray.get(0),resultNumberArray.get(1),resultNumberArray.get(2),
+        return new LotteryData(resultNumberArray.get(0),resultNumberArray.get(1),resultNumberArray.get(2),
                 resultNumberArray.get(3),resultNumberArray.get(4),resultNumberArray.get(5));
-        Dlog.e("lotteryData : " + lotteryData);
+    }
 
-        //랜덤 변수 생성 완료
+    /**
+     * 1. 여러개 번호를 생산해 내야함
+     * 2. 패턴 추가 필요. ( 총 합산과 평균이 작냐 크냐로 패턴을 제작할 수 있을 듯. )
+     *  -> 20000회 결과값 합산에 평균은 135임.
+     *  -> 역대 당첨 번호 합산에 평균은 138임
+     * */
 
-        //조건 확인 로직 추가
 
 
+    private static ArrayList<InputLotteryData> excelLotteryDataArrayList = null;
+    private boolean equalsHistory(Context context, LotteryData lotteryData){
+        /**
+         * 1. 이전 나온 숫자는 다시 나올 수 없음.
+         * */
+        if(excelLotteryDataArrayList == null){
+            excelLotteryDataArrayList = readExcel(context);
+        
+        }
+
+        for(InputLotteryData inputLotteryData : excelLotteryDataArrayList){
+            ArrayList<Integer> integerArrayList = new ArrayList<>();
+            integerArrayList.add(lotteryData.number_1);
+            integerArrayList.add(lotteryData.number_2);
+            integerArrayList.add(lotteryData.number_3);
+            integerArrayList.add(lotteryData.number_4);
+            integerArrayList.add(lotteryData.number_5);
+            integerArrayList.add(lotteryData.number_6);
+
+            int cnt = 0;
+            cnt += Collections.frequency(integerArrayList,inputLotteryData.result1);
+            cnt += Collections.frequency(integerArrayList,inputLotteryData.result2);
+            cnt += Collections.frequency(integerArrayList,inputLotteryData.result3);
+            cnt += Collections.frequency(integerArrayList,inputLotteryData.result4);
+            cnt += Collections.frequency(integerArrayList,inputLotteryData.result5);
+            cnt += Collections.frequency(integerArrayList,inputLotteryData.result6);
+
+            if(cnt == 6){
+                return false;
+            }else if(cnt == 5){ //2,3 등
+                cnt += Collections.frequency(integerArrayList,inputLotteryData.resultBonus);
+                if(cnt == 6){
+                    // 2등
+                    return false;
+                }else {
+                    // 3등
+                    return false;
+                }
+            }
+        }
+        Dlog.e("number_1 : " + lotteryData.number_1 + " , number_2 : " + lotteryData.number_2+ " , number_3 : " + lotteryData.number_3
+                + " , number_4 : " + lotteryData.number_4+ " , number_5 : " + lotteryData.number_5+ " , number_6 : " + lotteryData.number_6);
+        return true;
+    }
+
+
+    /**
+     * 아래는 테스트를 위한
+     * */
+    private void avgPlusResult(){
+        Dlog.e("avgPlusResult !! ");
+        int result = 0;
+        int max = 0;
+        int min = 300;
+        for(int i = 1 ; i <= 20000 ; i++){
+            ArrayList<Integer> resultNumberArray = new ArrayList<>();
+            int plus = 0;
+            for(int j = 0 ; resultNumberArray.size() < 6 ; j ++){
+                int randomNum = (int) (Math.random()*44)+1;
+                if(resultNumberArray.isEmpty()){
+                    resultNumberArray.add(randomNum);
+                    plus+=randomNum;
+                }else{
+                    if(!resultNumberArray.contains(randomNum)){
+                        resultNumberArray.add(randomNum);
+                        plus+=randomNum;
+                    }
+                }
+            }
+
+            if(max < plus){
+                max = plus;
+            }
+            if(min > plus){
+                min = plus;
+            }
+            result += plus;
+
+            //int avgResult = (result/i);
+
+
+
+        }
+
+
+        Dlog.e("Test 1111 result : " + result + " , (result/20000) : " + (result/20000) + " , max : " + max + " , min : " + min );
+    }
+    //(result/20000) : 135 , max : 237 , min : 42
+    //(result/20000) : 134 , max : 242 , min : 34
+
+    private void similarTest (){
+        Dlog.e("similarTest !! ");
+        int cnt1 = 0;
+        int cnt2 = 0;
+        int cnt3 = 0;
+        int cnt4 = 0;
+        int cnt5 = 0;
+        for(int i = 0 ; i < excelLotteryDataArrayList.size() ; i ++){
+            InputLotteryData inputLotteryData = excelLotteryDataArrayList.get(i);
+            for(int j = 0; j < excelLotteryDataArrayList.size() ; j ++){
+                if(j != i){
+                    InputLotteryData inputLotteryData1 = excelLotteryDataArrayList.get(j);
+                    ArrayList<Integer> integerArrayList = new ArrayList<>();
+                    integerArrayList.add(inputLotteryData.result1);
+                    integerArrayList.add(inputLotteryData.result2);
+                    integerArrayList.add(inputLotteryData.result3);
+                    integerArrayList.add(inputLotteryData.result4);
+                    integerArrayList.add(inputLotteryData.result5);
+                    integerArrayList.add(inputLotteryData.result6);
+
+                    int cnt = 0;
+                    cnt += Collections.frequency(integerArrayList,inputLotteryData1.result1);
+                    cnt += Collections.frequency(integerArrayList,inputLotteryData1.result2);
+                    cnt += Collections.frequency(integerArrayList,inputLotteryData1.result3);
+                    cnt += Collections.frequency(integerArrayList,inputLotteryData1.result4);
+                    cnt += Collections.frequency(integerArrayList,inputLotteryData1.result5);
+                    cnt += Collections.frequency(integerArrayList,inputLotteryData1.result6);
+
+                    if(cnt == 6){
+                        cnt1 += 1;
+                    }else if(cnt == 5){ //2,3 등
+                        cnt += Collections.frequency(integerArrayList,inputLotteryData.resultBonus);
+                        if(cnt == 6){
+                            // 2등
+                            cnt2 += 1;
+                        }else {
+                            // 3등
+                            cnt3 += 1;
+                        }
+                    }else if(cnt == 4){
+                        cnt4 += 1;
+                    }else if(cnt == 3){
+                        cnt5 += 1;
+                    }
+                }
+            }
+        }
+
+        Dlog.e("cnt1 : " + cnt1 + " , cnt2 : " + cnt2 + " , cnt3 : " + cnt3+ " , cnt4 : " + cnt4+ " , cnt5 : " + cnt5);
+
+    }
+
+    private void testPattern(){
+        Dlog.e("testPattern !! ");
+        int high = 0;
+        int low = 0;
+        int totalPlus = 0;
+        int max = 0;
+        int min = 300;
+        for(InputLotteryData inputLotteryData : excelLotteryDataArrayList){
+            int plus = inputLotteryData.result1 + inputLotteryData.result2 + inputLotteryData.result3 + inputLotteryData.result4 + inputLotteryData.result5 + inputLotteryData.result6;
+            if(plus >= 138){ //상위 패턴
+                Dlog.e("plus : " + plus + ",,상위");
+                high +=1;
+            }else{ // 하위 패턴
+                Dlog.e("plus : " + plus + ",,,,,,하위");
+                low +=1;
+            }
+            if(max < plus){
+                max = plus;
+            }
+            if(min > plus){
+                min = plus;
+            }
+            totalPlus += plus;
+        }
+
+        Dlog.e("avg : "+(totalPlus/(high+low))+", high : " + high + ", low : " + low +", max : "+ max + " , min : " + min);
     }
 }
