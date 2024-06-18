@@ -14,150 +14,6 @@ import jxl.Workbook;
 
 public class LotteryDataController {
 
-    //Excel input -> ArrayList
-    public ArrayList<InputLotteryData> readExcel(Context context){
-        try{
-            // 샘플파일 읽어오기
-            String sampleFileName = "excel.xls";
-            InputStream is = context.getResources().getAssets().open(sampleFileName);
-            Workbook wb = Workbook.getWorkbook(is);
-
-            Sheet sheet = wb.getSheet(0);
-            int colTotal = sheet.getColumns();
-            int rowIndexStart = 1;
-            int rowTotal = sheet.getColumn(colTotal-1).length;
-
-            /**
-             * b = 회차
-             * c = 추첨일
-             * d = 1등 당첨자수
-             * e = 1등 당첨금액
-             * f = 2등 당첨자수
-             * g = 2등 당첨금액
-             * h = 3등 당첨자수
-             * i = 3등 당첨금액
-             * j = 4등 당첨자수
-             * k = 4등 당첨금액
-             * l = 5등 당첨자수
-             * m = 5등 당첨금액
-             * n = 당첨번호 1
-             * o = 당첨번호 2
-             * p = 당첨번호 3
-             * q = 당첨번호 4
-             * r = 당첨번호 5
-             * s = 당첨번호 6
-             * t = 보너스
-             *
-             * 4번째 부터
-             * */
-            ArrayList<InputLotteryData> lotteryDataArrayList = new ArrayList<>();
-            for(int row = rowIndexStart ; row < rowTotal ; row ++){
-                InputLotteryData inputLotteryData = new InputLotteryData();
-                if(row >= 3){
-                    for(int col = 1; col < colTotal ; col++){
-                        String contents = sheet.getCell(col,row).getContents();
-                        switch (col){
-                            case 1 :
-                                inputLotteryData.round = (int)convertLong(contents);
-                                break;
-                            case 2 :
-                                inputLotteryData.date = (String) contents;
-                                break;
-                            case 3 :
-                                inputLotteryData.resultCount1 = String.valueOf(convertLong(contents));
-                                break;
-                            case 4 :
-                                inputLotteryData.resultMoney1 = convertLong(contents);
-                                break;
-                            case 5 :
-                                inputLotteryData.resultCount2 = String.valueOf(convertLong(contents));
-                                break;
-                            case 6 :
-                                inputLotteryData.resultMoney2 = convertLong(contents);
-                                break;
-                            case 7 :
-                                inputLotteryData.resultCount3 = String.valueOf(convertLong(contents));
-                                break;
-                            case 8 :
-                                inputLotteryData.resultMoney3 = convertLong(contents);
-                                break;
-                            case 9 :
-                                inputLotteryData.resultCount4 = String.valueOf(convertLong(contents));
-                                break;
-                            case 10 :
-                                inputLotteryData.resultMoney4 = convertLong(contents);
-                                break;
-                            case 11 :
-                                inputLotteryData.resultCount5 = String.valueOf(convertLong(contents));
-                                break;
-                            case 12 :
-                                inputLotteryData.resultMoney5 = convertLong(contents);
-                                break;
-                            case 13 :
-                                inputLotteryData.result1 = convertInteger(contents);
-                                break;
-                            case 14 :
-                                inputLotteryData.result2 = convertInteger(contents);
-                                break;
-                            case 15 :
-                                inputLotteryData.result3 = convertInteger(contents);
-                                break;
-                            case 16 :
-                                inputLotteryData.result4 = convertInteger(contents);
-                                break;
-                            case 17 :
-                                inputLotteryData.result5 = convertInteger(contents);
-                                break;
-                            case 18 :
-                                inputLotteryData.result6 = convertInteger(contents);
-                                break;
-                            case 19 :
-                                inputLotteryData.resultBonus = convertInteger(contents);
-                                break;
-                        }
-                    }
-                    lotteryDataArrayList.add(inputLotteryData);
-                }
-
-            }
-
-
-            Collections.sort(lotteryDataArrayList, new Comparator<InputLotteryData>() {
-                @Override
-                public int compare(InputLotteryData inputLotteryData, InputLotteryData t1) {
-                    return inputLotteryData.round - t1.round;
-                }
-            });
-
-            return lotteryDataArrayList;
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private int convertInteger(String input){
-        try{
-            if(input != null && !input.equals("")){
-                input = input.replaceAll(",","").replaceAll("원","");
-                return Integer.parseInt(input);
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return 0;
-    }
-    private long convertLong(String input){
-        try{
-            if(input != null && !input.equals("")){
-                input = input.replaceAll(",","").replaceAll("원","");
-                return Long.parseLong(input);
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return 0;
-    }
 
 
 
@@ -167,12 +23,19 @@ public class LotteryDataController {
 
         //int numberOfNum = 0;
 
+        /*Dlog.e("test 1111 : " + equalsHistory(context,new LotteryData(5,11,16,25,26,38)));
+        Dlog.e("test 2222 : " + equalsHistory(context,new LotteryData(6,7,10,14,15,38)));
+        Dlog.e("test 3333 : " + equalsHistory(context,new LotteryData(2,7,20,26,39,45)));
+        Dlog.e("test 4444 : " + equalsHistory(context,new LotteryData(5,9,14,17,18,32)));
+        Dlog.e("test 5555 : " + equalsHistory(context,new LotteryData(1,2,14,27,42,44)));*/
+
 
         LotteryData lotteryData = makeNumber();
         if(!equalsHistory(context,lotteryData)){
-
+            numberController(context);
         }else{// 예전에 동일 번호 없다면 true
             //패턴 확인
+            Dlog.e("result : " +lotteryData.number_1 +" , "+ lotteryData.number_2 +" , "+ lotteryData.number_3+" , "+ lotteryData.number_4+" , "+ lotteryData.number_5+" , "+ lotteryData.number_6 );
             int plus = lotteryData.number_1 + lotteryData.number_2+ lotteryData.number_3+ lotteryData.number_4+ lotteryData.number_5+ lotteryData.number_6;
             if(plus >= 138){ //상위 패턴
                 Dlog.e("plus : "+plus+", 상위");
@@ -224,7 +87,15 @@ public class LotteryDataController {
      *  -> 20000회 결과값 합산에 평균은 135임.
      *  -> 역대 당첨 번호 합산에 평균은 138임
      * */
-
+    /*
+     * 1. 단순 랜덤 숫자 출력
+     * 2. 연속되거나 나오지 않을 것이라고 가정된 번호 제거
+     * 3. 기존 1,2,3등 당첨번호 제거
+     * 4. 당첨번호의 합을 정규화하여 3분위로 나눠서. 직전회차에 나온 3분위 제거
+     * 5. 기존 4등 당첨번호로 제한 ( 통계상 높은 확률 )
+     * 6. 2개 이상 숫자가 10 미만일 수 없음
+     * 7. 연속적인 숫자 존재 하지 않음
+     * */
 
 
     private static ArrayList<InputLotteryData> excelLotteryDataArrayList = null;
@@ -233,43 +104,75 @@ public class LotteryDataController {
          * 1. 이전 나온 숫자는 다시 나올 수 없음.
          * */
         if(excelLotteryDataArrayList == null){
-            excelLotteryDataArrayList = readExcel(context);
-        
+            excelLotteryDataArrayList = new ReadData().readExcel(context);
         }
+        ArrayList<Integer> integerArrayList = new ArrayList<>();
+        integerArrayList.add(lotteryData.number_1);
+        integerArrayList.add(lotteryData.number_2);
+        integerArrayList.add(lotteryData.number_3);
+        integerArrayList.add(lotteryData.number_4);
+        integerArrayList.add(lotteryData.number_5);
+        integerArrayList.add(lotteryData.number_6);
+
+        boolean grade1 = false;
+        boolean grade2 = false;
+        boolean grade3 = false;
+        boolean grade4 = false;
 
         for(InputLotteryData inputLotteryData : excelLotteryDataArrayList){
-            ArrayList<Integer> integerArrayList = new ArrayList<>();
-            integerArrayList.add(lotteryData.number_1);
-            integerArrayList.add(lotteryData.number_2);
-            integerArrayList.add(lotteryData.number_3);
-            integerArrayList.add(lotteryData.number_4);
-            integerArrayList.add(lotteryData.number_5);
-            integerArrayList.add(lotteryData.number_6);
-
-            int cnt = 0;
-            cnt += Collections.frequency(integerArrayList,inputLotteryData.result1);
-            cnt += Collections.frequency(integerArrayList,inputLotteryData.result2);
-            cnt += Collections.frequency(integerArrayList,inputLotteryData.result3);
-            cnt += Collections.frequency(integerArrayList,inputLotteryData.result4);
-            cnt += Collections.frequency(integerArrayList,inputLotteryData.result5);
-            cnt += Collections.frequency(integerArrayList,inputLotteryData.result6);
-
-            if(cnt == 6){
-                return false;
-            }else if(cnt == 5){ //2,3 등
-                cnt += Collections.frequency(integerArrayList,inputLotteryData.resultBonus);
-                if(cnt == 6){
-                    // 2등
-                    return false;
-                }else {
-                    // 3등
-                    return false;
+            int cnt = 0 ;
+            for(int number : integerArrayList){
+                if(number == inputLotteryData.result1){
+                    cnt+= 1;
+                }else if(number == inputLotteryData.result2){
+                    cnt+= 1;
+                }else if(number == inputLotteryData.result3){
+                    cnt+= 1;
+                }else if(number == inputLotteryData.result4){
+                    cnt+= 1;
+                }else if(number == inputLotteryData.result5){
+                    cnt+= 1;
+                }else if(number == inputLotteryData.result6){
+                    cnt+= 1;
                 }
             }
+            if(cnt == 6){
+                grade1 = true;
+            }else if(cnt == 5){ //2,3 등
+                for(int number : integerArrayList){
+                    if(number == inputLotteryData.resultBonus){
+                        cnt+=1;
+                    }
+                }
+                if(cnt == 6){
+                    // 2등
+                    grade2 = true;
+                }else {
+                    // 3등
+                    grade3 = true;
+                }
+            }else if(cnt == 4){
+                grade4 = true;
+            }
         }
-        Dlog.e("number_1 : " + lotteryData.number_1 + " , number_2 : " + lotteryData.number_2+ " , number_3 : " + lotteryData.number_3
-                + " , number_4 : " + lotteryData.number_4+ " , number_5 : " + lotteryData.number_5+ " , number_6 : " + lotteryData.number_6);
-        return true;
+
+        if(grade1||grade2||grade3){
+            if(grade1){
+                Dlog.e("result 1등");
+            }else if(grade2){
+                Dlog.e("result 2등");
+            }else if(grade3){
+                Dlog.e("result 3등");
+            }
+            return false;
+        }else if(grade4){
+            return true;
+        }
+
+
+        /*Dlog.e("number_1 : " + lotteryData.number_1 + " , number_2 : " + lotteryData.number_2+ " , number_3 : " + lotteryData.number_3
+                + " , number_4 : " + lotteryData.number_4+ " , number_5 : " + lotteryData.number_5+ " , number_6 : " + lotteryData.number_6);*/
+        return false;
     }
 
 
@@ -395,5 +298,15 @@ public class LotteryDataController {
         }
 
         Dlog.e("avg : "+(totalPlus/(high+low))+", high : " + high + ", low : " + low +", max : "+ max + " , min : " + min);
+    }
+
+    public void resultTest(Context context){
+        if(excelLotteryDataArrayList == null){
+            excelLotteryDataArrayList = new ReadData().readExcel(context);
+        }
+        for(InputLotteryData inputLotteryData : excelLotteryDataArrayList){
+            Dlog.e("inputLottery : " + inputLotteryData.result1 + " , " + inputLotteryData.result2 + " , " + inputLotteryData.result3 + " , " + inputLotteryData.result4 + " , " + inputLotteryData.result5 + " , " + inputLotteryData.result6);
+            Dlog.e("equls : " + equalsHistory(context,new LotteryData(inputLotteryData.result1,inputLotteryData.result2,inputLotteryData.result3,inputLotteryData.result4,inputLotteryData.result5,inputLotteryData.result6)));
+        }
     }
 }
